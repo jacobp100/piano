@@ -5,7 +5,10 @@ import { file, trackIndex } from "./file";
 
 fromEvent<KeyboardEvent>(document, "keypress")
   .pipe(filter(e => e.key === " "))
-  .subscribe(() => togglePlaying());
+  .subscribe(e => {
+    e.preventDefault();
+    togglePlaying();
+  });
 
 fromEvent<KeyboardEvent>(document, "keypress")
   .pipe(

@@ -28,16 +28,9 @@ combineLatest(
   time,
   keyScale,
   keyboardData,
-  (ctx, layout, theme, file, track, time, keyScale, keyboardData) => ({
-    ctx,
-    layout,
-    theme,
-    file,
-    track,
-    time,
-    keyScale,
-    keyboardData
-  })
+  (ctx, layout, theme, file, track, time, keyScale, keyboardData) => {
+    return { ctx, layout, theme, file, track, time, keyScale, keyboardData };
+  }
 )
   .pipe(
     throttleTime(0, animationFrameScheduler, { leading: true, trailing: true })

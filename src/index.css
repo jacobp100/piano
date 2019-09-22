@@ -1,9 +1,27 @@
 :root {
   user-select: none;
+  --primary: #66bb6a;
 }
 
 body {
   margin: 0;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  background: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  margin-top: -6px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  border: none;
+  background-color: var(--primary);
+  height: 2px;
+  border-radius: 1px;
 }
 
 #canvas {
@@ -32,12 +50,16 @@ body {
   border: none;
   background: none;
   font: 16px sans-serif;
-  color: #66bb6a;
+  color: var(--primary);
 }
 
 #toolbar button:active,
 #toolbar button:focus {
   opacity: 0.6;
+}
+
+#play {
+  min-width: 80px;
 }
 
 @media (hover: none) and (pointer: coarse) {

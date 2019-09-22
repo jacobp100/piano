@@ -9,6 +9,8 @@ import {
 } from "rxjs/operators";
 import { Track } from "../parseMidi/types";
 import { Theme } from "../theme";
+import { player } from "../playback/player";
+import { Order, orderedArraySearch } from "../util";
 import layout, { Layout } from "./layout";
 import {
   NORMAL,
@@ -16,11 +18,11 @@ import {
   Key,
   normalKeys,
   accidentalKeys,
+  accidentalHeight,
   keyForNoteNumber
 } from "./keyConfig";
 import keyScale, { KeyScale, x as keyX, width as keyWidth } from "./keyScale";
 import panHandler, { PanEvent } from "./panHandler";
-import { player } from "../playback/player";
 
 const panHandlerKeys = layout.pipe(
   map(layout => layout.keyboard),
@@ -28,14 +30,23 @@ const panHandlerKeys = layout.pipe(
   withLatestFrom(keyScale, (o, keyScale) =>
     o.pipe(
       map<PanEvent, number>(({ x, y }) => {
-        const hasKey = (key: Key) => {
-          const kX = keyX(key, keyScale);
-          const kWidth = keyWidth(key, keyScale);
-          return x >= kX && x <= kX + kWidth && y <= key.height;
+        const keyOrder = (key: Key) => {
+          const x0 = keyX(key, keyScale);
+          if (x < x0) {
+            return Order.Before;
+          } else {
+            const x1 = x0 + keyWidth(key, keyScale);
+            return x < x1 ? Order.Match : Order.After;
+          }
         };
 
-        let key = accidentalKeys.find(hasKey);
-        if (key === undefined) key = normalKeys.find(hasKey);
+        let key =
+          y <= accidentalHeight
+            ? orderedArraySearch(accidentalKeys, keyOrder)
+            : undefined;
+        if (key === undefined) {
+          key = orderedArraySearch(normalKeys, keyOrder);
+        }
 
         return key !== undefined ? key.noteNumber : -1;
       }),

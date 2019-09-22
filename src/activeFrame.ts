@@ -3,10 +3,10 @@ import { distinctUntilChanged } from "rxjs/operators";
 import { Track } from "./parseMidi/types";
 import { track } from "./file";
 import time from "./time";
-import { binarySearch, Order } from "./util";
+import { orderedArraySearch, Order } from "./util";
 
 export const frameForTime = (time: number, track: Track) => {
-  return binarySearch(track.frames, frame => {
+  return orderedArraySearch(track.frames, frame => {
     if (frame.startTime > time) return Order.Before;
     if (frame.endTime <= time) return Order.After;
     return Order.Match;

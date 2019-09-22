@@ -9,6 +9,8 @@ export type Key = {
   type: 0 | 1;
 };
 
+export const accidentalHeight = 35;
+
 const baseKeys = [
   { x: 0, width: 12, height: 60, type: NORMAL },
   { x: 10, width: 8, height: 35, type: ACCIDENTAL },

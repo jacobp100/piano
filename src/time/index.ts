@@ -5,8 +5,8 @@ import { file } from "../file";
 import { verticalScale } from "../config";
 import { scrollHeight } from "./scrollHeight";
 import {
-  setUserScrollTop,
   setScrollTop,
+  setUserScrollTop,
   scrollTop,
   userScrollTop
 } from "./scrollTop";

@@ -1,5 +1,5 @@
-import { fromEvent, animationFrameScheduler } from "rxjs";
-import { map, filter, throttleTime } from "rxjs/operators";
+import { fromEvent } from "rxjs";
+import { map, filter } from "rxjs/operators";
 import scrollableElement from "../scrollableElement";
 
 let subjectValue = Number.MIN_SAFE_INTEGER;
@@ -21,8 +21,7 @@ export const scrollTop = fromEvent(scrollableElement, "scroll", {
     const scrollTop: number =
       element === window ? element.scrollY : (element as HTMLElement).scrollTop;
     return scrollTop | 0;
-  }),
-  throttleTime(0, animationFrameScheduler)
+  })
 );
 
 export const userScrollTop = scrollTop.pipe(

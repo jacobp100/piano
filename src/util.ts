@@ -4,7 +4,7 @@ export enum Order {
   Match
 }
 
-export const binarySearch = <T>(
+export const orderedArraySearch = <T>(
   array: T[],
   fn: (value: T) => Order
 ): T | undefined => {
