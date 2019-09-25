@@ -18,14 +18,25 @@ const noteNameToNumber = name => {
   return noteNumber;
 };
 
-const processSoundBuffer = (name, sf, format) =>
+const processSoundBuffer = (name, sf, format, filter) =>
   fetch(nameToUrl(name, sf, format))
     .then(res => res.text())
     .then(js => {
       const script = new vm.Script(js);
       const context = vm.createContext();
       script.runInContext(context);
-      const data = context.MIDI.Soundfont[name];
+
+      let data = context.MIDI.Soundfont[name];
+      if (filter) {
+        data = filter.reduce((accum, key) => {
+          const name =
+            typeof key === "string"
+              ? key
+              : `${notes[key % 12]}${(key / 12) | 0}`;
+          accum[name] = data[name];
+          return accum;
+        }, {});
+      }
 
       const writeStream = fs.createWriteStream(
         path.join(__dirname, `../public/${name}.sfbuf`),
@@ -56,4 +67,4 @@ const processSoundBuffer = (name, sf, format) =>
     });
 
 processSoundBuffer("acoustic_grand_piano");
-processSoundBuffer("percussion", "FluidR3_GM");
+processSoundBuffer("percussion", "FluidR3_GM", undefined, [31, 32]);
