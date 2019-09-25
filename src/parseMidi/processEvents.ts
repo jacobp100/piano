@@ -6,11 +6,12 @@ export type Event = {
   next: Event | null;
 };
 
-const createNoteEvent = (time: number): Event => ({
-  time,
-  startNotes: [],
-  next: null
-});
+let numEvents = 0;
+
+const createNoteEvent = (time: number): Event => {
+  numEvents += 1;
+  return { time, startNotes: [], next: null };
+};
 
 const insertTime = (startEvent: Event, time: number) => {
   let currentEvent = startEvent;
@@ -37,7 +38,8 @@ const insertTime = (startEvent: Event, time: number) => {
   return currentEvent;
 };
 
-export default (notes: Note[]): Event => {
+export default (notes: Note[]): { events: Event; numEvents: number } => {
+  numEvents = 0;
   const events = createNoteEvent(0);
 
   let currentNoteEvent = events;
@@ -47,5 +49,5 @@ export default (notes: Note[]): Event => {
     insertTime(currentNoteEvent, note.endTime);
   });
 
-  return events;
+  return { events, numEvents };
 };

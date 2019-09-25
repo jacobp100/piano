@@ -33,7 +33,6 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 #toolbar {
   display: flex;
-  justify-content: flex-end;
   position: fixed;
   top: 0;
   left: 0;
@@ -42,6 +41,10 @@ input[type="range"]::-webkit-slider-runnable-track {
   background-color: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(8px);
   z-index: 2;
+}
+
+#toolbar .spacer {
+  flex: 1;
 }
 
 #toolbar button {

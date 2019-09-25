@@ -1,10 +1,8 @@
 import { Key, NORMAL, keys, note0Number, keyboardWidth } from "./keyConfig";
-import layout from "./layout";
-import { map, distinctUntilChanged } from "rxjs/operators";
 
 export type KeyScale = Uint32Array;
 
-const create = (width: number): KeyScale => {
+export const create = (width: number): KeyScale => {
   const horizontalScale = (width + 1) / keyboardWidth;
   const scale = new Uint32Array(keys.length * 2);
   let currentNormalKeyX1 = 0;
@@ -24,12 +22,6 @@ const create = (width: number): KeyScale => {
   });
   return scale;
 };
-
-export default layout.pipe(
-  map(layout => layout.score.width),
-  distinctUntilChanged(),
-  map(create)
-);
 
 export const x = (key: Key, scale: KeyScale) => {
   const index = key.noteNumber - note0Number;

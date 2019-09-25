@@ -1,6 +1,7 @@
 import { fromEvent } from "rxjs";
 import { map, distinctUntilChanged } from "rxjs/operators";
 import { playingSubject, togglePlaying } from "./playback";
+import { audioContext } from "./player";
 import playbackRate from "./playbackRate";
 
 export const height = 50;
@@ -27,3 +28,13 @@ fromEvent(playbackRateSlider, "input")
     distinctUntilChanged()
   )
   .subscribe(playbackRate);
+
+const unmuteButton = document.getElementById("unmute")!;
+
+fromEvent(unmuteButton, "click").subscribe(() => {
+  audioContext.resume();
+});
+
+fromEvent(audioContext, "statechange").subscribe(() => {
+  unmuteButton.style.display = audioContext.state === "suspended" ? "" : "none";
+});

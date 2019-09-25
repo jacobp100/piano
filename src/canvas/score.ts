@@ -3,17 +3,16 @@ import { Theme } from "../theme";
 import { verticalScale } from "../config";
 import { Layout } from "./layout";
 import { NORMAL, keyForNoteNumber } from "./keyConfig";
-import { KeyScale, x as keyX, width as keyWidth } from "./keyScale";
+import { x as keyX, width as keyWidth } from "./keyScale";
 
 export default (
   ctx: CanvasRenderingContext2D,
   layout: Layout,
   theme: Theme,
   track: Track,
-  startTime: number,
-  keyScale: KeyScale
+  startTime: number
 ) => {
-  const viewbox = layout.score;
+  const { score: viewbox, keyScale } = layout;
   const endTime = (startTime + viewbox.height / verticalScale) | 0;
   const { notes } = track;
 

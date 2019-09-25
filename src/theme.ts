@@ -9,6 +9,8 @@ export type Theme = {
   accidentalKey: string;
   octaveDivision: string;
   accidentalDivision: string;
+  barDivision: string;
+  beatDivision: string;
   background: string;
   foreground: string;
 };
@@ -22,6 +24,8 @@ const light: Theme = {
   accidentalKey: "#E0E0E0",
   octaveDivision: "#EEE",
   accidentalDivision: "#FAFAFA",
+  barDivision: "#EEE",
+  beatDivision: "#F5F5F5",
   background: "#FFF",
   foreground: "#BDBDBD"
 };
@@ -35,6 +39,8 @@ const dark: Theme = {
   accidentalKey: "#111",
   octaveDivision: "#222",
   accidentalDivision: "#080808",
+  barDivision: "#222",
+  beatDivision: "#111",
   background: "#000",
   foreground: "#424242"
 };

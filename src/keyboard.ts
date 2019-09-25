@@ -16,7 +16,7 @@ fromEvent<KeyboardEvent>(document, "keypress")
     map(([e, file, trackIndex]) => {
       if (e.key === ",") {
         return Math.max(trackIndex - 1, 0);
-      } else if (e.key === ".") {
+      } else if (e.key === "." && file !== null) {
         return Math.min(trackIndex + 1, file.tracks.length - 1);
       } else {
         return trackIndex;

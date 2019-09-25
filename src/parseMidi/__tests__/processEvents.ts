@@ -6,11 +6,11 @@ import parseNotes from "../parseNotes";
 import processEvents, { Event } from "../processEvents";
 
 const midi = parseMidi(
-  fs.readFileSync(path.join(__dirname, "../../../public/test.mid"))
+  fs.readFileSync(path.join(__dirname, "../../../public/aladdin.mid"))
 );
 const { timingChanges } = parseTimingChanges(midi.header, midi.tracks[0]);
 const notes = parseNotes(midi.tracks[1], timingChanges);
-const events = processEvents(notes);
+const { events } = processEvents(notes);
 
 const flatMap = <T>(event: Event, fn: (event: Event) => T) => {
   const out = [];

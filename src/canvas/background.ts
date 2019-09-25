@@ -1,18 +1,20 @@
+import { File } from "../parseMidi/types";
 import { Theme } from "../theme";
 import { Layout } from "./layout";
 import { accidentalKeys, keyForNoteNumber } from "./keyConfig";
-import { KeyScale, x as keyX, width as keyWidth } from "./keyScale";
+import { x as keyX, width as keyWidth } from "./keyScale";
+import { verticalScale } from "../config";
 
 export default (
   ctx: CanvasRenderingContext2D,
   layout: Layout,
   theme: Theme,
-  keyScale: KeyScale
+  file: File,
+  startTime: number
 ) => {
-  const { width, height, pixelWidth, score } = layout;
+  const { height, pixelWidth, score, keyScale } = layout;
+  const endTime = (startTime + score.height / verticalScale) | 0;
   const { x, y } = score;
-  ctx.fillStyle = theme.background;
-  ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = theme.accidentalDivision;
   accidentalKeys.forEach(key => {
@@ -33,5 +35,22 @@ export default (
       pixelWidth,
       height - pixelWidth
     );
+  }
+
+  let lastWasEmphasized = true;
+  ctx.fillStyle = theme.barDivision;
+  const ticks = file.metronome;
+  for (let i = 0; i < ticks.length; i += 1) {
+    const { time, emphasized } = ticks[i];
+    if (time < startTime) continue;
+    if (time > endTime) break;
+    const y = (score.height - (time - startTime) * verticalScale) | 0;
+
+    if (lastWasEmphasized !== emphasized) {
+      ctx.fillStyle = emphasized ? theme.barDivision : theme.beatDivision;
+      lastWasEmphasized = emphasized;
+    }
+
+    ctx.fillRect(score.x, y, score.width, 1);
   }
 };

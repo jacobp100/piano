@@ -9,7 +9,7 @@ import {
 } from "rxjs/operators";
 import { Track } from "../parseMidi/types";
 import { Theme } from "../theme";
-import { player } from "../playback/player";
+import { piano } from "../player";
 import { Order, orderedArraySearch } from "../util";
 import layout, { Layout } from "./layout";
 import {
@@ -21,8 +21,10 @@ import {
   accidentalHeight,
   keyForNoteNumber
 } from "./keyConfig";
-import keyScale, { KeyScale, x as keyX, width as keyWidth } from "./keyScale";
+import { x as keyX, width as keyWidth } from "./keyScale";
 import panHandler, { PanEvent } from "./panHandler";
+
+const keyScale = layout.pipe(map(layout => layout.keyScale));
 
 const panHandlerKeys = layout.pipe(
   map(layout => layout.keyboard),
@@ -59,7 +61,7 @@ const panHandlerKeys = layout.pipe(
   startWith(-1)
 );
 
-panHandlerKeys.pipe(filter(key => key !== -1)).subscribe(player);
+panHandlerKeys.pipe(filter(key => key !== -1)).subscribe(piano);
 
 export const data = panHandlerKeys;
 
@@ -85,10 +87,9 @@ export default (
   theme: Theme,
   track: Track,
   startTime: number,
-  keyScale: KeyScale,
   data: number
 ) => {
-  const { pixelWidth } = layout;
+  const { pixelWidth, keyScale } = layout;
   const viewbox = layout.keyboard;
   const activeKeys = getActiveKeys(track, startTime, data);
 

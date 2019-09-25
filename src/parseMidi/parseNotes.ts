@@ -18,7 +18,7 @@ export default (track: MidiTrack, timingChanges: TimingChange): Note[] => {
   };
 
   const notes: Note[] = [];
-  const pendingNotes: Note[][] = Array.from({ length: 128 }, () => []);
+  const pendingNotes: Note[][] = Array.from(new Array(128), () => []);
 
   track.forEach(event => {
     midiTime += event.deltaTime;

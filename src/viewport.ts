@@ -1,5 +1,5 @@
-import { fromEvent } from "rxjs";
-import { startWith, map } from "rxjs/operators";
+import { BehaviorSubject, fromEvent } from "rxjs";
+import { map } from "rxjs/operators";
 
 export type Viewport = {
   width: number;
@@ -15,7 +15,9 @@ const getViewport = (): Viewport => ({
   pixelRatio: window.devicePixelRatio
 });
 
-export default fromEvent(window, "resize").pipe(
-  map(getViewport),
-  startWith(getViewport())
-);
+const viewport = new BehaviorSubject(getViewport());
+export default viewport;
+
+fromEvent(window, "resize")
+  .pipe(map(getViewport))
+  .subscribe(viewport);

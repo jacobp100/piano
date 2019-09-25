@@ -10,6 +10,14 @@ export type TimingChange = {
   next: TimingChange | null;
 };
 
+export type Tick = {
+  index: number;
+  time: number;
+  emphasized: boolean;
+};
+
+export type Ticks = Tick[];
+
 export type Note = {
   index: number;
   noteNumber: number;
@@ -28,12 +36,11 @@ export type Frame = {
 export type Track = {
   notes: Note[];
   frames: Frame[];
-  minOctave: number;
-  maxOctave: number;
 };
 
 export type File = {
   timingChanges: TimingChange;
+  metronome: Ticks;
   tracks: Track[];
   duration: number;
 };

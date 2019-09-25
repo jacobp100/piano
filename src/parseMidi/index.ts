@@ -3,22 +3,14 @@ import parseTimingChanges from "./parseTimingChanges";
 import parseNotes from "./parseNotes";
 import processEvents from "./processEvents";
 import processFrames from "./processFrames";
+import parseMetronome from "./parseMetronome";
 import { TimingChange, File, Track } from "./types";
 
 const parseTrack = (timingChanges: TimingChange, track: MidiTrack): Track => {
   const notes = parseNotes(track, timingChanges);
-  const events = processEvents(notes);
-  const frames = processFrames(events);
-
-  let minOctave = 6;
-  let maxOctave = 0;
-  notes.forEach(note => {
-    const octave = (note.noteNumber / 12) | 0;
-    minOctave = Math.min(minOctave, octave);
-    maxOctave = Math.max(maxOctave, octave);
-  });
-
-  return { notes, frames, minOctave, maxOctave };
+  const { events, numEvents } = processEvents(notes);
+  const frames = processFrames(events, numEvents);
+  return { notes, frames };
 };
 
 export default (buffer: Uint8Array): File => {
@@ -39,5 +31,7 @@ export default (buffer: Uint8Array): File => {
 
   finalTimingChange.endTime = duration;
 
-  return { timingChanges, tracks, duration };
+  const metronome = parseMetronome(timingChanges);
+
+  return { timingChanges, metronome, tracks, duration };
 };

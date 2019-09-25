@@ -11,11 +11,13 @@ const addNotesFromPreviousFrame = (
   });
 };
 
-export default (events: Event): Frame[] => {
-  const frames = [];
-  let currentFrame = null;
+export default (events: Event, numEvents: number): Frame[] => {
+  let currentFrame: Frame | null = null;
+  let event = events;
 
-  for (let i = 0, event = events; event !== null; event = event.next!, i += 1) {
+  // Use Array.from(new Array) to generate a packed array of fixed length
+  // to save resizing the array while constructing
+  const frames = Array.from(new Array(numEvents), (_, i) => {
     const previousFrame = currentFrame;
     currentFrame = {
       index: i,
@@ -29,18 +31,20 @@ export default (events: Event): Frame[] => {
       addNotesFromPreviousFrame(currentFrame, previousFrame);
     }
 
-    frames.push(currentFrame);
-  }
+    event = event.next!;
+
+    return currentFrame;
+  });
 
   if (currentFrame === null) {
     throw new Error("Logic error");
   }
 
-  const duration = currentFrame.notes.reduce(
+  const duration = currentFrame!.notes.reduce(
     (accum, note) => Math.max(accum, note.endTime),
-    currentFrame.startTime
+    currentFrame!.startTime
   );
-  currentFrame.endTime = duration;
+  currentFrame!.endTime = duration;
 
   return frames;
 };

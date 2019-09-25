@@ -1,7 +1,6 @@
 import { combineLatest, Subject } from "rxjs";
-import { distinctUntilChanged, withLatestFrom } from "rxjs/operators";
+import { distinctUntilChanged } from "rxjs/operators";
 import viewport, { Viewport } from "../viewport";
-import { file } from "../file";
 import { verticalScale } from "../config";
 import { scrollHeight } from "./scrollHeight";
 import {
@@ -56,6 +55,4 @@ export default combineLatest(
   mapCombinedScrollEvents
 );
 
-file
-  .pipe(withLatestFrom(scrollHeight, (_, height) => height))
-  .subscribe(setUserScrollTop);
+scrollHeight.subscribe(setUserScrollTop);

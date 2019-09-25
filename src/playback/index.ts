@@ -3,7 +3,8 @@ import {
   from,
   interval,
   animationFrameScheduler,
-  combineLatest
+  combineLatest,
+  of
 } from "rxjs";
 import {
   filter,
@@ -11,13 +12,16 @@ import {
   withLatestFrom,
   mapTo,
   switchMap,
-  scan
+  scan,
+  switchAll
 } from "rxjs/operators";
+import { file } from "../file";
 import time, { timeSubject, userTime } from "../time";
 import playbackRate from "../playbackRate";
 import { velocity } from "../operators";
-import { player } from "./player";
+import { piano, percusson } from "../player";
 import notes from "./notes";
+import metronome from "./metronome";
 
 export let playingSubject = new BehaviorSubject(false);
 
@@ -25,41 +29,51 @@ export const togglePlaying = () => {
   playingSubject.next(!playingSubject.value);
 };
 
-userTime.pipe(mapTo(false)).subscribe(playingSubject);
+file.pipe(mapTo(false)).subscribe(playingSubject);
 
-const nanTime = Number.MIN_SAFE_INTEGER;
-const playbackTime = playingSubject.pipe(
-  withLatestFrom(time, (playing, time) => (playing ? time : nanTime)),
-  switchMap(startTime => {
-    if (startTime === nanTime) return from([]);
+playingSubject
+  .pipe(
+    switchMap(playing => (playing ? userTime : of())),
+    mapTo(false)
+  )
+  .subscribe(playingSubject);
 
-    return interval(0, animationFrameScheduler).pipe(
-      withLatestFrom(playbackRate, (_, playbackRate) => playbackRate),
-      scan(
-        ({ lastSystemTime, lastPlaybackTime }, playbackRate) => {
-          const systemTime = Date.now();
-          const systemTimeIncrement =
-            lastSystemTime !== nanTime ? systemTime - lastSystemTime : 0;
-          const time =
-            (lastPlaybackTime + systemTimeIncrement * playbackRate) | 0;
-          return { lastSystemTime: systemTime, lastPlaybackTime: time };
-        },
-        { lastSystemTime: nanTime, lastPlaybackTime: startTime }
-      )
-    );
-  }),
-  map(accum => accum.lastPlaybackTime)
+playingSubject
+  .pipe(
+    withLatestFrom(time, (playing, startTime) => {
+      if (!playing) return from([]);
+
+      const startSystemTime = Date.now();
+      return interval(0, animationFrameScheduler).pipe(
+        withLatestFrom(playbackRate, (_, playbackRate) => playbackRate),
+        scan(
+          ({ lastSystemTime, lastPlaybackTime }, playbackRate) => {
+            const systemTime = Date.now();
+            const systemTimeIncrement = systemTime - lastSystemTime;
+            const time =
+              (lastPlaybackTime + systemTimeIncrement * playbackRate) | 0;
+            return { lastSystemTime: systemTime, lastPlaybackTime: time };
+          },
+          { lastSystemTime: startSystemTime, lastPlaybackTime: startTime }
+        )
+      );
+    }),
+    switchAll(),
+    map(accum => accum.lastPlaybackTime)
+  )
+  .subscribe(timeSubject);
+
+const userTimeFiltered = combineLatest(
+  userTime,
+  velocity(userTime),
+  (userTime, velocity) =>
+    velocity > -2 && velocity < 5 ? userTime : Number.MAX_SAFE_INTEGER
+).pipe(filter(time => time !== Number.MAX_SAFE_INTEGER));
+
+const playTime = playingSubject.pipe(
+  switchMap(playing => (playing ? time : userTimeFiltered))
 );
 
-playbackTime.subscribe(timeSubject);
+playTime.pipe(notes()).subscribe(piano);
 
-playbackTime.pipe(notes(true)).subscribe(player);
-
-combineLatest(userTime, velocity(userTime), (userTime, velocity) =>
-  velocity > -2 && velocity < 5 ? userTime : Number.MAX_SAFE_INTEGER
-)
-  .pipe(
-    filter(time => time !== Number.MAX_SAFE_INTEGER),
-    notes()
-  )
-  .subscribe(player);
+playTime.pipe(metronome()).subscribe(percusson);

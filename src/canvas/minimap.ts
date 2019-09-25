@@ -1,4 +1,4 @@
-import { withLatestFrom, map, switchAll } from "rxjs/operators";
+import { withLatestFrom, map, switchAll, filter } from "rxjs/operators";
 import { File, Track } from "../parseMidi/types";
 import { Theme } from "../theme";
 import { setTime } from "../time";
@@ -10,12 +10,14 @@ import panHandler from "./panHandler";
 
 layout
   .pipe(
-    map(layout => layout.minimap),
+    map(layout => layout.minimap!),
+    filter(viewbox => viewbox !== null),
     panHandler(),
     switchAll(),
-    withLatestFrom(file, ({ y, height }, { duration }) => {
+    withLatestFrom(file, ({ y, height }, file) => {
+      if (file === null) return 0;
       const clampedRatio = Math.max(Math.min(y / height, 1), 0);
-      return (1 - clampedRatio) * duration;
+      return (1 - clampedRatio) * file.duration;
     })
   )
   .subscribe(setTime);
@@ -31,6 +33,9 @@ export default (
   startTime: number
 ) => {
   const viewbox = layout.minimap;
+
+  if (viewbox === null) return;
+
   const endTime = startTime + viewbox.height / verticalScale;
   const yScale = viewbox.height / (file.duration + endTime - startTime);
 

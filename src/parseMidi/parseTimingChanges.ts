@@ -22,15 +22,17 @@ const createTimingChange = (
 });
 
 export const convertMidiTime = (
-  {
+  timingChange: TimingChange,
+  midiTime: number
+): number => {
+  const {
     startTime,
     startMidiTime,
     endMidiTime,
     ticksPerBeat,
     microsecondsPerBeat
-  }: TimingChange,
-  midiTime: number
-): number => {
+  } = timingChange;
+
   if (
     process.env.NODE_ENV === "development" &&
     (startMidiTime > midiTime || endMidiTime < midiTime)
