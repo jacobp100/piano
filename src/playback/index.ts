@@ -15,15 +15,17 @@ import {
   scan,
   switchAll
 } from "rxjs/operators";
-import { file } from "../file";
+import { Note } from "../parseMidi/types";
+import { file, track } from "../file";
 import time, { timeSubject, userTime } from "../time";
-import playbackRate from "../playbackRate";
-import { velocity } from "../operators";
 import { piano, percusson } from "../player";
 import notes from "./notes";
 import metronome from "./metronome";
+import { velocity } from "./util";
 
-export let playingSubject = new BehaviorSubject(false);
+export const playingSubject = new BehaviorSubject(false);
+export const playbackRate = new BehaviorSubject(1);
+export const enablePercussionTrack = new BehaviorSubject(true);
 
 export const togglePlaying = () => {
   playingSubject.next(!playingSubject.value);
@@ -74,6 +76,22 @@ const playTime = playingSubject.pipe(
   switchMap(playing => (playing ? time : userTimeFiltered))
 );
 
-playTime.pipe(notes()).subscribe(piano);
+track
+  .pipe(
+    switchMap(track =>
+      track !== null ? playTime.pipe(notes(track)) : from([])
+    )
+  )
+  .subscribe(piano);
 
-playTime.pipe(metronome()).subscribe(percusson);
+combineLatest(file, enablePercussionTrack, (file, enablePercussionTrack) =>
+  enablePercussionTrack && file !== null ? file.percussionTrack : null
+)
+  .pipe(
+    switchMap(percussionTrack => {
+      const percussionNotes: any =
+        percussionTrack !== null ? notes(percussionTrack) : metronome();
+      return playTime.pipe<Note>(percussionNotes);
+    })
+  )
+  .subscribe(percusson);

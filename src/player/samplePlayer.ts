@@ -15,7 +15,9 @@ export const playSample = (
   noteNumber: number,
   volume: number
 ) => {
-  const sample = samples.get(noteNumber)!;
+  const sample = samples.get(noteNumber);
+
+  if (sample === undefined) return;
 
   if (sample.existingNode !== null) {
     sample.existingNode.stop();

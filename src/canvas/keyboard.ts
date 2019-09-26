@@ -10,7 +10,7 @@ import {
 import { Track } from "../parseMidi/types";
 import { Theme } from "../theme";
 import { piano } from "../player";
-import { Order, orderedArraySearch } from "../util";
+import { orderedArraySearch, Order } from "../util";
 import layout, { Layout } from "./layout";
 import {
   NORMAL,
@@ -32,7 +32,7 @@ const panHandlerKeys = layout.pipe(
   withLatestFrom(keyScale, (o, keyScale) =>
     o.pipe(
       map<PanEvent, number>(({ x, y }) => {
-        const keyOrder = (key: Key) => {
+        const keyOrder = (key: Key): Order => {
           const x0 = keyX(key, keyScale);
           if (x < x0) {
             return Order.Before;
@@ -117,7 +117,7 @@ export default (
     ctx.fillStyle = theme.normalNoteFocus;
     activeKeys.forEach(noteNumber => {
       const key = keyForNoteNumber(noteNumber);
-      if (key.type === NORMAL) renderKey(key);
+      if (key !== undefined && key.type === NORMAL) renderKey(key);
     });
   }
 
@@ -128,7 +128,7 @@ export default (
     ctx.fillStyle = theme.accidentalNoteFocus;
     activeKeys.forEach(noteNumber => {
       const key = keyForNoteNumber(noteNumber);
-      if (key.type === ACCIDENTAL) renderKey(key);
+      if (key !== undefined && key.type === ACCIDENTAL) renderKey(key);
     });
   }
 };

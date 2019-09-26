@@ -18,6 +18,9 @@ const noteNameToNumber = name => {
   return noteNumber;
 };
 
+const noteNumberToName = number =>
+  `${notes[number % 12]}${((number / 12) | 0) - 1}`;
+
 const processSoundBuffer = (name, sf, format, filter) =>
   fetch(nameToUrl(name, sf, format))
     .then(res => res.text())
@@ -29,10 +32,8 @@ const processSoundBuffer = (name, sf, format, filter) =>
       let data = context.MIDI.Soundfont[name];
       if (filter) {
         data = filter.reduce((accum, key) => {
-          const name =
-            typeof key === "string"
-              ? key
-              : `${notes[key % 12]}${(key / 12) | 0}`;
+          const name = typeof key === "string" ? key : noteNumberToName(key);
+          console.log(key, name);
           accum[name] = data[name];
           return accum;
         }, {});
@@ -67,4 +68,4 @@ const processSoundBuffer = (name, sf, format, filter) =>
     });
 
 processSoundBuffer("acoustic_grand_piano");
-processSoundBuffer("percussion", "FluidR3_GM", undefined, [31, 32]);
+processSoundBuffer("percussion", "FluidR3_GM");

@@ -27,8 +27,8 @@ export default (
   });
 
   ctx.fillStyle = theme.octaveDivision;
-  for (let noteNumber = 24; noteNumber <= 96; noteNumber += 12) {
-    const key = keyForNoteNumber(noteNumber);
+  for (let note = 24; note <= 96; note += 12) {
+    const key = keyForNoteNumber(note)!;
     ctx.fillRect(
       x + keyX(key, keyScale) - pixelWidth,
       y,

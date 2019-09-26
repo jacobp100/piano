@@ -1,27 +1,40 @@
-import { MidiTrack, parseMidi } from "midi-file";
+import { parseMidiFile } from "jasmid.ts";
 import parseTimingChanges from "./parseTimingChanges";
-import parseNotes from "./parseNotes";
-import processEvents from "./processEvents";
-import processFrames from "./processFrames";
+import parseEvents, { TrackType } from "./parseEvents";
+import parseTrack from "./parseTrack";
 import parseMetronome from "./parseMetronome";
-import { TimingChange, File, Track } from "./types";
+import concatNotes from "./concatNotes";
+import { File, Track } from "./types";
 
-const parseTrack = (timingChanges: TimingChange, track: MidiTrack): Track => {
-  const notes = parseNotes(track, timingChanges);
-  const { events, numEvents } = processEvents(notes);
-  const frames = processFrames(events, numEvents);
-  return { notes, frames };
-};
-
-export default (buffer: Uint8Array): File => {
-  const midi = parseMidi(buffer as any);
+export default (buffer: ArrayBuffer): File => {
+  const midi = parseMidiFile(buffer);
   const { timingChanges, finalTimingChange } = parseTimingChanges(
     midi.header,
     midi.tracks[0]
   );
-  const tracks = Array.from(new Array(midi.tracks.length - 1), (_, i) =>
-    parseTrack(timingChanges, midi.tracks[i + 1])
-  );
+
+  const percussionNotesArray = [];
+  const tracks: Track[] = [];
+
+  for (let i = 0; i < midi.tracks.length; i += 1) {
+    const { name, type, notes } = parseEvents(midi.tracks[i], timingChanges);
+    switch (type) {
+      case TrackType.Instrumental:
+        const track = parseTrack(notes, name || `Track ${i}`);
+        tracks.push(track);
+        break;
+      case TrackType.Percussion:
+        percussionNotesArray.push(notes);
+        break;
+      case TrackType.Unknown:
+      case TrackType.Invalid:
+        break;
+    }
+  }
+
+  const percussionNotes = concatNotes(percussionNotesArray);
+  const percussionTrack =
+    percussionNotes !== null ? parseTrack(percussionNotes, "Percussion") : null;
 
   const duration = tracks.reduce((currentMax, track) => {
     const { frames } = track;
@@ -32,6 +45,7 @@ export default (buffer: Uint8Array): File => {
   finalTimingChange.endTime = duration;
 
   const metronome = parseMetronome(timingChanges);
+  console.log(tracks);
 
-  return { timingChanges, metronome, tracks, duration };
+  return { timingChanges, metronome, tracks, percussionTrack, duration };
 };

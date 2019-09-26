@@ -10,10 +10,8 @@ import { Tick } from "../parseMidi/types";
 import { file } from "../file";
 import { orderedArraySearch, Order } from "../util";
 
-export enum TickType {
-  Normal = 32,
-  Emphasized = 31
-}
+const TickNormal = 32;
+const TickEmphasized = 31;
 
 const initialTimeWindow = 8;
 
@@ -65,5 +63,5 @@ export default () => (o: Observable<number>) =>
     }),
     filter(tick => tick !== undefined),
     distinctUntilChanged(),
-    map(tick => (tick.emphasized ? TickType.Emphasized : TickType.Normal))
+    map(tick => (tick.emphasized ? TickEmphasized : TickNormal))
   );

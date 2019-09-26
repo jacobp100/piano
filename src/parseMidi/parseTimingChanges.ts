@@ -1,4 +1,4 @@
-import { MidiHeader, MidiTrack } from "midi-file";
+import { MidiEvent } from "jasmid.ts";
 import { TimingChange } from "./types";
 import { microsecondsPerBeatToBpm } from "./util";
 
@@ -73,8 +73,8 @@ const appendTimingChange = (
 };
 
 export default (
-  header: MidiHeader,
-  track: MidiTrack
+  header: { ticksPerBeat: number },
+  track: MidiEvent[]
 ): { timingChanges: TimingChange; finalTimingChange: TimingChange } => {
   let midiTime = 0;
 
@@ -92,7 +92,9 @@ export default (
   track.forEach(event => {
     midiTime += event.deltaTime;
 
-    switch (event.type) {
+    if (event.type !== "meta") return;
+
+    switch (event.subType) {
       case "timeSignature": {
         const { numerator, denominator } = event;
         if (currentTimingChange.startMidiTime === midiTime) {

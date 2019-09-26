@@ -21,7 +21,7 @@ export type Ticks = Tick[];
 export type Note = {
   index: number;
   noteNumber: number;
-  velocity: number;
+  gain: number;
   startTime: number;
   endTime: number;
 };
@@ -34,6 +34,7 @@ export type Frame = {
 };
 
 export type Track = {
+  name: string;
   notes: Note[];
   frames: Frame[];
 };
@@ -42,5 +43,6 @@ export type File = {
   timingChanges: TimingChange;
   metronome: Ticks;
   tracks: Track[];
+  percussionTrack: Track | null;
   duration: number;
 };

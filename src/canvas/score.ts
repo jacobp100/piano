@@ -24,6 +24,8 @@ export default (
     if (note.startTime > endTime) break;
 
     const key = keyForNoteNumber(note.noteNumber);
+    if (key === undefined) continue;
+
     const { type } = key;
     const noteY =
       (viewbox.height - (note.endTime - startTime) * verticalScale) | 0;

@@ -1,7 +1,7 @@
 export enum Order {
-  Before,
-  After,
-  Match
+  Before = -1,
+  After = 1,
+  Match = 0
 }
 
 export const orderedArraySearch = <T>(
@@ -16,13 +16,13 @@ export const orderedArraySearch = <T>(
     const element = array[index];
     const result = fn(element);
     switch (result) {
-      case Order.Before:
+      case -1:
         upper = index - 1;
         break;
-      case Order.After:
+      case 1:
         lower = index + 1;
         break;
-      case Order.Match:
+      case 0:
         return element;
       default:
         return undefined;

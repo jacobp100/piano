@@ -1,0 +1,63 @@
+input[type="range"] {
+  -webkit-appearance: none;
+  background: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  margin-top: -6px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  border: none;
+  background-color: var(--primary);
+  height: 2px;
+  border-radius: 1px;
+}
+
+#canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+#toolbar {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 50px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 2;
+}
+
+#toolbar .spacer {
+  flex: 1;
+}
+
+#toolbar button {
+  height: 50px;
+  padding: 0 12px;
+  border: none;
+  background: none;
+  font: 16px sans-serif;
+  color: var(--primary);
+}
+
+#toolbar button:active,
+#toolbar button:focus {
+  opacity: 0.6;
+}
+
+#play {
+  min-width: 80px;
+}
+
+@media (prefers-color-scheme: dark) {
+  #toolbar {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}

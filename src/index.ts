@@ -9,51 +9,52 @@ import "./canvas";
 import "./keyboard";
 import "./toolbar";
 
-fromEvent(document, "dragover").subscribe(e => {
-  e.preventDefault();
-});
+const midiSources = [];
 
-const dropEvents = fromEvent<DragEvent>(document, "drop");
+if (!process.env.REACT_APP_APP_BUILD) {
+  fromEvent(document, "dragover").subscribe(e => {
+    e.preventDefault();
+  });
 
-dropEvents.subscribe(e => {
-  e.preventDefault();
-});
+  const dropEvents = fromEvent<DragEvent>(document, "drop");
 
-const midiDropFiles = dropEvents.pipe(
-  switchMap(e => {
-    const item = e.dataTransfer !== null ? e.dataTransfer.items[0] : undefined;
-    const file = item !== undefined ? item.getAsFile() : null;
-    if (file !== null) {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
-      return fromEvent<ProgressEvent>(reader, "load");
-    } else {
-      return from([]);
-    }
-  }),
-  map(e => {
-    return (e.target as any).result as ArrayBuffer;
-  })
-);
+  dropEvents.subscribe(e => {
+    e.preventDefault();
+  });
 
-let midiFiles = midiDropFiles;
-if (process.env.NODE_ENV === "development") {
-  const initialMidiFile =
-    (window.location.pathname.slice("/".length) || "aladdin") + ".mid";
-
-  const initialFetchRequest = fetch(initialMidiFile).then(res =>
-    res.arrayBuffer()
+  const midiDropFiles = dropEvents.pipe(
+    switchMap(e => {
+      const item =
+        e.dataTransfer !== null ? e.dataTransfer.items[0] : undefined;
+      const file = item !== undefined ? item.getAsFile() : null;
+      if (file !== null) {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        return fromEvent<ProgressEvent>(reader, "load");
+      } else {
+        return from([]);
+      }
+    }),
+    map(e => {
+      return (e.target as any).result as ArrayBuffer;
+    })
   );
-  const midiInitialLoad = from(initialFetchRequest);
 
-  midiFiles = merge(midiInitialLoad, midiFiles);
+  midiSources.push(midiDropFiles);
 }
 
-midiFiles
-  .pipe(
-    map((arrayBuffer: ArrayBuffer) => {
-      const buffer = new Uint8Array(arrayBuffer);
-      return parseMidi(buffer);
-    })
-  )
-  .subscribe(file);
+const initialMidiFile = window.location.search.slice("?".length);
+if (initialMidiFile) {
+  const initialFetchRequest = fetch(`/midi/${initialMidiFile}`).then(res =>
+    res.arrayBuffer()
+  );
+  const initialMidiLoad = from(initialFetchRequest);
+
+  midiSources.push(initialMidiLoad);
+}
+
+if (midiSources.length > 0) {
+  merge(...midiSources)
+    .pipe(map(parseMidi))
+    .subscribe(file);
+}

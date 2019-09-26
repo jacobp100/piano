@@ -1,15 +1,10 @@
-import fs from "fs";
-import path from "path";
-import { parseMidi } from "midi-file";
 import parseTimingChanges from "../parseTimingChanges";
-import parseNotes from "../parseNotes";
+import parseEvents from "../parseEvents";
 import processEvents, { Event } from "../processEvents";
+import midi from "../__testUtil__/midiFile";
 
-const midi = parseMidi(
-  fs.readFileSync(path.join(__dirname, "../../../public/aladdin.mid"))
-);
 const { timingChanges } = parseTimingChanges(midi.header, midi.tracks[0]);
-const notes = parseNotes(midi.tracks[1], timingChanges);
+const { notes } = parseEvents(midi.tracks[1], timingChanges);
 const { events } = processEvents(notes);
 
 const flatMap = <T>(event: Event, fn: (event: Event) => T) => {

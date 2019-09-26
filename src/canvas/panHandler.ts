@@ -7,9 +7,8 @@ import {
   map,
   switchAll
 } from "rxjs/operators";
-import scrollableElement from "../scrollableElement";
+import { canvasElement, scrollableElement } from "../dom";
 import { Viewbox } from "./layout";
-import canvas from "./canvas";
 
 export type PanEvent = {
   x: number;
@@ -78,7 +77,7 @@ const eventHandler = <T extends Event>(
 
 export default () => (viewbox: Observable<Viewbox>) => {
   const mouseEvents = eventHandler(
-    fromEvent<MouseEvent>(canvas, "mousedown"),
+    fromEvent<MouseEvent>(canvasElement, "mousedown"),
     fromEvent<MouseEvent>(document, "mousemove"),
     fromEvent<MouseEvent>(document, "mouseup"),
     viewbox,

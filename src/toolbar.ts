@@ -1,40 +1,56 @@
 import { fromEvent } from "rxjs";
 import { map, distinctUntilChanged } from "rxjs/operators";
-import { playingSubject, togglePlaying } from "./playback";
+import { insetTop } from "./config";
+import { playingSubject, playbackRate, togglePlaying } from "./playback";
 import { audioContext } from "./player";
-import playbackRate from "./playbackRate";
+import "./toolbar.css";
 
-export const height = 50;
+if (!process.env.REACT_APP_APP_BUILD) {
+  const height = 50;
+  insetTop.next(height);
 
-const playButton = document.getElementById("play")!;
+  const toolbarTemplate = document.createElement("template");
+  toolbarTemplate.innerHTML = `
+    <div id="toolbar">
+      <button id="unmute" type="button">Unmute</button>
+      <div class="spacer"></div>
+      <input id="playbackRate" type="range" min="0.1" max="2" step="0.1" />
+      <button id="play" type="button">Play</button>
+    </div>
+  `;
+  document.documentElement.appendChild(toolbarTemplate.content);
 
-fromEvent(playButton, "click").subscribe(togglePlaying);
+  const playButton = document.getElementById("play")!;
 
-playingSubject.subscribe(playing => {
-  playButton.textContent = playing ? "Pause" : "Play";
-});
+  fromEvent(playButton, "click").subscribe(togglePlaying);
 
-const playbackRateSlider = document.getElementById(
-  "playbackRate"
-)! as HTMLInputElement;
+  playingSubject.subscribe(playing => {
+    playButton.textContent = playing ? "Pause" : "Play";
+  });
 
-playbackRate.subscribe(value => {
-  playbackRateSlider.valueAsNumber = value;
-});
+  const playbackRateSlider = document.getElementById(
+    "playbackRate"
+  )! as HTMLInputElement;
 
-fromEvent(playbackRateSlider, "input")
-  .pipe(
-    map((e: any): number => e.currentTarget.valueAsNumber),
-    distinctUntilChanged()
-  )
-  .subscribe(playbackRate);
+  playbackRate.subscribe(value => {
+    playbackRateSlider.valueAsNumber = value;
+  });
 
-const unmuteButton = document.getElementById("unmute")!;
+  fromEvent(playbackRateSlider, "input")
+    .pipe(
+      map((e: any): number => e.currentTarget.valueAsNumber),
+      distinctUntilChanged()
+    )
+    .subscribe(playbackRate);
 
-fromEvent(unmuteButton, "click").subscribe(() => {
-  audioContext.resume();
-});
+  const unmuteButton = document.getElementById("unmute")!;
 
-fromEvent(audioContext, "statechange").subscribe(() => {
-  unmuteButton.style.display = audioContext.state === "suspended" ? "" : "none";
-});
+  fromEvent(unmuteButton, "click").subscribe(() => {
+    audioContext.resume();
+  });
+
+  fromEvent(audioContext, "statechange").subscribe(() => {
+    unmuteButton.style.display =
+      audioContext.state === "suspended" ? "" : "none";
+  });
+}

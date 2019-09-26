@@ -1,6 +1,6 @@
-import { map } from "rxjs/operators";
+import { combineLatest } from "rxjs";
 import viewport, { Viewport } from "../viewport";
-import { height as toolbarHeight } from "../toolbar";
+import { insetTop } from "../config";
 import { keyboardHeight, keys } from "./keyConfig";
 import { create as createKeyScale, KeyScale } from "./keyScale";
 
@@ -22,14 +22,13 @@ export type Layout = Viewport & {
   keyScale: KeyScale;
 };
 
-export default map<Viewport, Layout>(viewport => {
+export default combineLatest(viewport, insetTop, (viewport, insetTop) => {
   const { width, height, pixelWidth, pixelRatio } = viewport;
 
   const horizontalUiHidden = width < 768;
 
   const marginHorizontal = horizontalUiHidden ? 0 : defaultMarginHorizontal;
 
-  const insetTop = toolbarHeight;
   const scoreHeight = height - marginBottom;
   const scoreWidth = width - 2 * marginHorizontal;
   const keyScale = createKeyScale(scoreWidth);
@@ -73,4 +72,4 @@ export default map<Viewport, Layout>(viewport => {
     markings,
     keyScale
   };
-})(viewport);
+});

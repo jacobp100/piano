@@ -1,15 +1,15 @@
 import { map } from "rxjs/operators";
-import canvas from "./canvas";
+import { canvasElement } from "../dom";
 import layout, { Layout } from "./layout";
 
 export default map<Layout, CanvasRenderingContext2D>(layout => {
   const { pixelRatio } = layout;
-  canvas.setAttribute("width", `${layout.width * pixelRatio}`);
-  canvas.setAttribute("height", `${layout.height * pixelRatio}`);
-  canvas.style.width = `${layout.width}px`;
-  canvas.style.height = `${layout.height}px`;
+  canvasElement.setAttribute("width", `${layout.width * pixelRatio}`);
+  canvasElement.setAttribute("height", `${layout.height * pixelRatio}`);
+  canvasElement.style.width = `${layout.width}px`;
+  canvasElement.style.height = `${layout.height}px`;
 
-  const ctx = canvas.getContext("2d", { alpha: false })!;
+  const ctx = canvasElement.getContext("2d", { alpha: false })!;
   ctx.scale(pixelRatio, pixelRatio);
 
   return ctx;

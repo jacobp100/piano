@@ -27,12 +27,13 @@ const baseKeys = [
 ];
 
 const keyWidth = 84;
-export const note0Number = 21;
+export const firstNoteNumber = 21;
+const lastNoteNumber = 87 + 21;
 
 export const keys: Key[] = Array.from(new Array(88), (_, i) => {
   const { x, width, height, type } = baseKeys[i % 12];
   return {
-    noteNumber: i + note0Number,
+    noteNumber: i + firstNoteNumber,
     x: x + keyWidth * ((i / 12) | 0),
     width,
     height,
@@ -40,8 +41,12 @@ export const keys: Key[] = Array.from(new Array(88), (_, i) => {
   };
 });
 
-export const keyForNoteNumber = (noteNumber: number): Key =>
-  keys[noteNumber - note0Number];
+console.log({ lastNoteNumber, k: keys[keys.length - 1] });
+
+export const keyForNoteNumber = (note: number): Key | undefined =>
+  note >= firstNoteNumber && note <= lastNoteNumber
+    ? keys[note - firstNoteNumber]
+    : undefined;
 
 export const normalKeys = keys.filter(note => note.type === NORMAL);
 export const accidentalKeys = keys.filter(note => note.type === ACCIDENTAL);

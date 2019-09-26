@@ -43,7 +43,11 @@ export default (
   track.notes.forEach(note => {
     const { startTime, endTime, noteNumber } = note;
     const duration = endTime - startTime;
-    const { type } = keyForNoteNumber(noteNumber);
+
+    const key = keyForNoteNumber(noteNumber);
+    if (key === undefined) return;
+
+    const { type } = key;
     if (type !== lastType) {
       // Saves the browser from re-parsing the same hex string (see score.ts)
       lastType = type;

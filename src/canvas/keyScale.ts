@@ -1,4 +1,4 @@
-import { Key, NORMAL, keys, note0Number, keyboardWidth } from "./keyConfig";
+import { Key, NORMAL, keys, firstNoteNumber, keyboardWidth } from "./keyConfig";
 
 export type KeyScale = Uint32Array;
 
@@ -24,11 +24,11 @@ export const create = (width: number): KeyScale => {
 };
 
 export const x = (key: Key, scale: KeyScale) => {
-  const index = key.noteNumber - note0Number;
+  const index = key.noteNumber - firstNoteNumber;
   return scale[index << 1];
 };
 
 export const width = (key: Key, scale: KeyScale) => {
-  const index = key.noteNumber - note0Number;
+  const index = key.noteNumber - firstNoteNumber;
   return scale[(index << 1) + 1];
 };
