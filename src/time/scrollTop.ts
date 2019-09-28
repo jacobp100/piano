@@ -2,15 +2,14 @@ import { fromEvent } from "rxjs";
 import { map, filter } from "rxjs/operators";
 import { scrollableElement } from "../dom";
 
-let subjectValue = Number.MIN_SAFE_INTEGER;
-
 export const setUserScrollTop = (value: number) => {
   scrollableElement.scrollTo(0, value | 0);
 };
 
+let subjectValue = Number.MIN_SAFE_INTEGER;
 export const setScrollTop = (value: number) => {
   subjectValue = value | 0;
-  scrollableElement.scrollTo(0, value | 0);
+  scrollableElement.scrollTo(0, subjectValue);
 };
 
 export const scrollTop = fromEvent(scrollableElement, "scroll", {

@@ -1,7 +1,7 @@
 import { fromEvent } from "rxjs";
 import { map, distinctUntilChanged } from "rxjs/operators";
 import { insetTop } from "./config";
-import { playingSubject, playbackRate, togglePlaying } from "./playback";
+import { playing, playbackRate, togglePlaying } from "./playback";
 import { audioContext } from "./player";
 import "./toolbar.css";
 
@@ -18,13 +18,13 @@ if (!process.env.REACT_APP_APP_BUILD) {
       <button id="play" type="button">Play</button>
     </div>
   `;
-  document.documentElement.appendChild(toolbarTemplate.content);
+  document.body.append(toolbarTemplate.content);
 
   const playButton = document.getElementById("play")!;
 
   fromEvent(playButton, "click").subscribe(togglePlaying);
 
-  playingSubject.subscribe(playing => {
+  playing.subscribe(playing => {
     playButton.textContent = playing ? "Pause" : "Play";
   });
 

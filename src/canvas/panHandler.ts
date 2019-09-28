@@ -33,8 +33,8 @@ const eventHandler = <T extends Event>(
   startEvents: Observable<T>,
   moveEvents: Observable<T>,
   endEvents: Observable<T>,
-  viewbox: Observable<Viewbox>,
-  mapFn: (t: T) => Position
+  mapFn: (t: T) => Position,
+  viewbox: Observable<Viewbox>
 ) => {
   const panEvents = startEvents.pipe(
     withLatestFrom(viewbox, (e, viewbox) => {
@@ -75,25 +75,30 @@ const eventHandler = <T extends Event>(
   );
 };
 
+const notPassive = { passive: false };
 export default () => (viewbox: Observable<Viewbox>) => {
-  const mouseEvents = eventHandler(
-    fromEvent<MouseEvent>(canvasElement, "mousedown"),
-    fromEvent<MouseEvent>(document, "mousemove"),
-    fromEvent<MouseEvent>(document, "mouseup"),
-    viewbox,
-    mousePosition
-  );
-
   const touchEvents = eventHandler(
-    fromEvent<TouchEvent>(scrollableElement, "touchstart"),
-    fromEvent<TouchEvent>(scrollableElement, "touchmove"),
+    fromEvent<TouchEvent>(scrollableElement, "touchstart", notPassive),
+    fromEvent<TouchEvent>(scrollableElement, "touchmove", notPassive),
     merge(
-      fromEvent<TouchEvent>(scrollableElement, "touchend"),
-      fromEvent<TouchEvent>(scrollableElement, "touchcancel")
+      fromEvent<TouchEvent>(scrollableElement, "touchend", notPassive),
+      fromEvent<TouchEvent>(scrollableElement, "touchcancel", notPassive)
     ),
-    viewbox,
-    touchPosition
+    touchPosition,
+    viewbox
   );
 
-  return merge(mouseEvents, touchEvents);
+  if (process.env.REACT_APP_APP_BUILD) {
+    return touchEvents;
+  } else {
+    const mouseEvents = eventHandler(
+      fromEvent<MouseEvent>(canvasElement, "mousedown"),
+      fromEvent<MouseEvent>(document, "mousemove"),
+      fromEvent<MouseEvent>(document, "mouseup"),
+      mousePosition,
+      viewbox
+    );
+
+    return merge(mouseEvents, touchEvents);
+  }
 };

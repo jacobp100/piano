@@ -45,7 +45,6 @@ export default (buffer: ArrayBuffer): File => {
   finalTimingChange.endTime = duration;
 
   const metronome = parseMetronome(timingChanges);
-  console.log(tracks);
 
   return { timingChanges, metronome, tracks, percussionTrack, duration };
 };

@@ -1,7 +1,7 @@
 import { withLatestFrom, map, switchAll, filter } from "rxjs/operators";
 import { File, Track } from "../parseMidi/types";
 import { Theme } from "../theme";
-import { setTime } from "../time";
+import { setUserTime } from "../time";
 import { file } from "../file";
 import { verticalScale } from "../config";
 import layout, { Layout } from "./layout";
@@ -20,7 +20,7 @@ layout
       return (1 - clampedRatio) * file.duration;
     })
   )
-  .subscribe(setTime);
+  .subscribe(setUserTime);
 
 const note0Index = keys[0].noteNumber;
 

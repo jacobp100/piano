@@ -31,10 +31,10 @@ const light: Theme = {
 };
 
 const dark: Theme = {
-  normalNote: "#bdbdbd",
+  normalNote: "#BDBDBD",
   normalNoteFocus: "#FFF",
-  accidentalNote: "#2e7d32",
-  accidentalNoteFocus: "#43a047",
+  accidentalNote: "#2E7D32",
+  accidentalNoteFocus: "#43A047",
   normalKey: "#222",
   accidentalKey: "#111",
   octaveDivision: "#222",

@@ -7,7 +7,7 @@ rootTemplate.innerHTML = `
     <canvas id="canvas"></canvas>
   </div>
 `;
-document.documentElement.appendChild(rootTemplate.content);
+document.body.append(rootTemplate.content);
 
 export const sizingElement = document.getElementById("sizing")!;
 export const canvasElement = document.getElementById(

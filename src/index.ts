@@ -8,6 +8,7 @@ import "./playback";
 import "./canvas";
 import "./keyboard";
 import "./toolbar";
+import "./app";
 
 const midiSources = [];
 
@@ -45,7 +46,7 @@ if (!process.env.REACT_APP_APP_BUILD) {
 
 const initialMidiFile = window.location.search.slice("?".length);
 if (initialMidiFile) {
-  const initialFetchRequest = fetch(`/midi/${initialMidiFile}`).then(res =>
+  const initialFetchRequest = fetch(`/${initialMidiFile}.mid`).then(res =>
     res.arrayBuffer()
   );
   const initialMidiLoad = from(initialFetchRequest);

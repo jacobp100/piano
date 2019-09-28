@@ -7,7 +7,14 @@ const AudioContextConstructor: any =
   (window as any).AudioContext || (window as any).webkitAudioContext;
 export const audioContext: AudioContext = new AudioContextConstructor();
 
-const createInstrument = (name: string, gain: BehaviorSubject<number>) => {
+if (process.env.REACT_APP_APP_BUILD) {
+  audioContext.resume();
+}
+
+export const createInstrument = (
+  name: string,
+  gain: BehaviorSubject<number>
+) => {
   const instrument = new Subject<Note | number>();
 
   const request = from(loadSamples(name, audioContext));
@@ -28,6 +35,3 @@ export const piano = createInstrument(
   "acoustic_grand_piano",
   new BehaviorSubject(1)
 );
-
-export const percussionGain = new BehaviorSubject(1);
-export const percusson = createInstrument("percussion", percussionGain);

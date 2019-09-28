@@ -26,7 +26,6 @@ export default (
     const key = keyForNoteNumber(note.noteNumber);
     if (key === undefined) continue;
 
-    const { type } = key;
     const noteY =
       (viewbox.height - (note.endTime - startTime) * verticalScale) | 0;
     const noteHeight = Math.max(
@@ -34,6 +33,7 @@ export default (
       1
     );
 
+    const { type } = key;
     const isNormal = type === NORMAL;
     if (note.startTime <= startTime && note.endTime > startTime) {
       lastType = -1;

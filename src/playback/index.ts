@@ -17,30 +17,33 @@ import {
 } from "rxjs/operators";
 import { Note } from "../parseMidi/types";
 import { file, track } from "../file";
-import time, { timeSubject, userTime } from "../time";
-import { piano, percusson } from "../player";
+import time, { setTime, userTime } from "../time";
+import { createInstrument, piano } from "../player";
 import notes from "./notes";
 import metronome from "./metronome";
 import { velocity } from "./util";
 
-export const playingSubject = new BehaviorSubject(false);
+export const playing = new BehaviorSubject(false);
 export const playbackRate = new BehaviorSubject(1);
-export const enablePercussionTrack = new BehaviorSubject(true);
+
+export const metronomeVolume = new BehaviorSubject(1);
+export const metronomeUsesPercussionTrack = new BehaviorSubject(true);
+const percussion = createInstrument("percussion", metronomeVolume);
 
 export const togglePlaying = () => {
-  playingSubject.next(!playingSubject.value);
+  playing.next(!playing.value);
 };
 
-file.pipe(mapTo(false)).subscribe(playingSubject);
+file.pipe(mapTo(false)).subscribe(playing);
 
-playingSubject
+playing
   .pipe(
     switchMap(playing => (playing ? userTime : of())),
     mapTo(false)
   )
-  .subscribe(playingSubject);
+  .subscribe(playing);
 
-playingSubject
+playing
   .pipe(
     withLatestFrom(time, (playing, startTime) => {
       if (!playing) return from([]);
@@ -63,7 +66,7 @@ playingSubject
     switchAll(),
     map(accum => accum.lastPlaybackTime)
   )
-  .subscribe(timeSubject);
+  .subscribe(setTime);
 
 const userTimeFiltered = combineLatest(
   userTime,
@@ -72,7 +75,7 @@ const userTimeFiltered = combineLatest(
     velocity > -2 && velocity < 5 ? userTime : Number.MAX_SAFE_INTEGER
 ).pipe(filter(time => time !== Number.MAX_SAFE_INTEGER));
 
-const playTime = playingSubject.pipe(
+const playTime = playing.pipe(
   switchMap(playing => (playing ? time : userTimeFiltered))
 );
 
@@ -84,8 +87,11 @@ track
   )
   .subscribe(piano);
 
-combineLatest(file, enablePercussionTrack, (file, enablePercussionTrack) =>
-  enablePercussionTrack && file !== null ? file.percussionTrack : null
+combineLatest(
+  file,
+  metronomeUsesPercussionTrack,
+  (file, enablePercussionTrack) =>
+    enablePercussionTrack && file !== null ? file.percussionTrack : null
 )
   .pipe(
     switchMap(percussionTrack => {
@@ -94,4 +100,4 @@ combineLatest(file, enablePercussionTrack, (file, enablePercussionTrack) =>
       return playTime.pipe<Note>(percussionNotes);
     })
   )
-  .subscribe(percusson);
+  .subscribe(percussion);

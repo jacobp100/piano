@@ -1,5 +1,4 @@
-import { combineLatest, Subject } from "rxjs";
-import { distinctUntilChanged } from "rxjs/operators";
+import { combineLatest } from "rxjs";
 import viewport, { Viewport } from "../viewport";
 import { verticalScale } from "../config";
 import { scrollHeight } from "./scrollHeight";
@@ -10,26 +9,22 @@ import {
   userScrollTop
 } from "./scrollTop";
 
-const mapTimeToScrollTop = (
-  time: number,
-  scrollHeight: number,
-  viewport: Viewport
-) => {
+const timeToScrollTop = (time: number) => {
   const scrollBottom = time * verticalScale;
-  const scrollTop = (scrollHeight - scrollBottom - viewport.height) | 0;
+  const scrollTop =
+    (scrollHeight.value - scrollBottom - viewport.value.height) | 0;
   return scrollTop;
 };
 
-const userTimeSubject = new Subject<number>();
-combineLatest(userTimeSubject, scrollHeight, viewport, mapTimeToScrollTop)
-  .pipe(distinctUntilChanged())
-  .subscribe(setUserScrollTop);
-export const setTime = (value: number) => userTimeSubject.next(value);
+export const setUserTime = (time: number) => {
+  const scrollTop = timeToScrollTop(time);
+  setUserScrollTop(scrollTop);
+};
 
-export const timeSubject = new Subject<number>();
-combineLatest(timeSubject, scrollHeight, viewport, mapTimeToScrollTop)
-  .pipe(distinctUntilChanged())
-  .subscribe(setScrollTop);
+export const setTime = (time: number) => {
+  const scrollTop = timeToScrollTop(time);
+  setScrollTop(scrollTop);
+};
 
 const mapCombinedScrollEvents = (
   scrollTop: number,
