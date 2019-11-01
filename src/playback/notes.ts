@@ -40,12 +40,12 @@ export default (track: Track) => (o: Observable<number>) =>
 
         if (time > lastTime && time - lastTime < 50) {
           /*
-        When moving forward a short amount of time,
-        Add all notes from frames between last and current to account for
-        short frames
+          When moving forward a short amount of time,
+          Add all notes from frames between last and current to account for
+          short frames
 
-        Uses branch above to avoid nextNotes.includes check for current frame
-        */
+          Uses branch above to avoid nextNotes.includes check for current frame
+          */
           for (let i = lastFrame.index; i < frame.index; i += 1) {
             const frame = track.frames[i];
             frame.notes.forEach(note => {

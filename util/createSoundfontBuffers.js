@@ -33,7 +33,6 @@ const processSoundBuffer = (name, sf, format, filter) =>
       if (filter) {
         data = filter.reduce((accum, key) => {
           const name = typeof key === "string" ? key : noteNumberToName(key);
-          console.log(key, name);
           accum[name] = data[name];
           return accum;
         }, {});

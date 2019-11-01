@@ -13,11 +13,10 @@ const createTick = (
   timingChange: TimingChange,
   startIndex: number
 ): TickRange => {
-  const { denominator, numerator } = timingChange;
+  const { denominator, numerator, microsecondsPerBeat } = timingChange;
   const startTime = timingChange.startTime | 0;
   const endTime = timingChange.endTime | 0;
-  const microsecondIncrement =
-    timingChange.microsecondsPerBeat * (denominator / 4);
+  const microsecondIncrement = microsecondsPerBeat * (denominator / 4);
   const numTicks =
     (((endTime - startTime - 1) * 1e3) / microsecondIncrement) | 0;
   const endIndex = startIndex + numTicks;

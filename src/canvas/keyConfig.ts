@@ -51,5 +51,4 @@ export const accidentalKeys = keys.filter(note => note.type === ACCIDENTAL);
 
 const lastKey = keys[keys.length - 1];
 export const keyboardWidth = lastKey.x + lastKey.width;
-console.log(keyboardWidth);
 export const keyboardHeight = 60;
